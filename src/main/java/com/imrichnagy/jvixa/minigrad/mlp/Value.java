@@ -106,15 +106,40 @@ public class Value {
     }
 
     public Value sigmoid() {
-        return this; // TODO
+
+        Value out = new Value(
+                1 / (1 + Math.exp(-this.data)),
+                "tanh(" + this.label + ")", Operator.SIGMOID, this
+        );
+
+        out.gradientFunction = () -> this.gradient += out.data * (1 - out.data) * out.gradient;
+
+        return out;
+
     }
 
     public Value tanh() {
-        return this; // TODO
+
+        Value out = new Value(
+                Math.tanh(this.data),
+                "tanh(" + this.label + ")", Operator.TANH, this
+        );
+
+        out.gradientFunction = () -> this.gradient += (1 - Math.pow(out.data, 2)) * out.gradient;
+
+        return out;
     }
 
     public Value relu() {
-        return this; // TODO
+
+        Value out = new Value(
+                this.data > 0 ? this.data : 0,
+                "ReLU(" + this.label + ")", Operator.RELU, this
+        );
+
+        out.gradientFunction = () -> this.gradient += this.data > 0 ? 1 * out.gradient : 0;
+
+        return out;
     }
 
     public void backward() {

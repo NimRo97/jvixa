@@ -19,7 +19,7 @@ public class Neuron {
             weights.add(new Value(random.nextDouble(-1, 1), "w" + i));
         }
         if (useBias) {
-            bias = new Value(random.nextDouble(-1, 1), "b");
+            bias = new Value(0, "b");
         }
         this.activation = activation == null ? Activation.LINEAR : activation;
     }
