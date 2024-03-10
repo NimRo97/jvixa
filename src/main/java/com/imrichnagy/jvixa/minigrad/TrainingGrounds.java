@@ -1,6 +1,7 @@
 package com.imrichnagy.jvixa.minigrad;
 
 import com.imrichnagy.jvixa.minigrad.mlp.Network;
+import com.imrichnagy.jvixa.minigrad.mlp.Operator;
 import com.imrichnagy.jvixa.minigrad.mlp.Value;
 
 import java.util.HashSet;
@@ -20,7 +21,7 @@ public class TrainingGrounds {
         //training data
         Value[][] in = makeData(terms, batchSize, range, random);
         Network network = new Network(terms, hiddenLayers, false, null);
-        Value count = new Value(batchSize, new HashSet<>(), "c", "c");
+        Value count = new Value(batchSize);
 
         for (int i = 0; i < trainingCycles; i++) {
             Value loss = null;
@@ -47,7 +48,9 @@ public class TrainingGrounds {
             //update parameters
             network.update(descend);
 
-            System.out.println("Iteration " + i + " | mse: " + loss.data);
+            if (i % 10 == 0) {
+                System.out.println("Iteration " + i + " | mse: " + loss.data);
+            }
         }
 
         in = makeData(terms, 10, range, random);
@@ -73,8 +76,8 @@ public class TrainingGrounds {
         for (int b = 0; b < batchSize; b++) {
             Value[] inputs = new Value[length];
             for (int i = 0; i < length; i++) {
-                double val = (double) random.nextInt(range);
-                inputs[i] = new Value(val, new HashSet<>(), "X", "x" + i);
+                double val = random.nextInt(range);
+                inputs[i] = new Value(val, "x" + i + "(" + val + ")");
             }
             batch[b] = inputs;
         }
@@ -86,7 +89,7 @@ public class TrainingGrounds {
         for (Value input : inputs) {
             sum += input.data;
         }
-        Value out = new Value(sum, new HashSet<>(), "Y", "Y");
+        Value out = new Value(sum);
         return out;
     }
 }
