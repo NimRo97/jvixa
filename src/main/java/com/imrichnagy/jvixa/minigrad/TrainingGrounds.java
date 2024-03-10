@@ -20,7 +20,7 @@ public class TrainingGrounds {
 
 
         //training data
-        List<List<Value>> in = makeData(terms, batchSize, range, random);
+        List<List<Value>> in = makeTestData(terms, batchSize, range, random);
         Network network = new Network(terms, false, Activation.LINEAR, hiddenLayers);
         Value count = new Value(batchSize);
 
@@ -30,12 +30,12 @@ public class TrainingGrounds {
 
             for (int b = 0; b < batchSize; b++) {
                 List<Value> out = network.call(in.get(b));
-                Value pred = fun(in.get(b));
+                Value expected = fun(in.get(b));
 
                 if (b == 0) {
-                    loss = out.getFirst().sub(pred).pow(2);
+                    loss = out.getFirst().sub(expected).pow(2);
                 } else {
-                    loss = loss.add(out.getFirst().sub(pred).pow(2));
+                    loss = loss.add(out.getFirst().sub(expected).pow(2));
                 }
             }
             loss=loss.div(count);
@@ -49,12 +49,12 @@ public class TrainingGrounds {
             //update parameters
             network.update(descend);
 
-            if (i % 10 == 0) {
+            if (i % 50 == 0) {
                 System.out.println("Iteration " + i + " | mse: " + loss.data);
             }
         }
 
-        in = makeData(terms, 10, range, random);
+        in = makeTestData(terms, 10, range, random);
 
         for (int b = 0; b < 10; b++) {
             List<Value> out = network.call(in.get(b));
@@ -70,9 +70,8 @@ public class TrainingGrounds {
     }
 
 
-    public static List<List<Value>> makeData(int length, int range, int batchSize, Random random) {
+    private static List<List<Value>> makeTestData(int length, int range, int batchSize, Random random) {
 
-        double sum = 0;
         List<List<Value>> batch = new ArrayList<>(batchSize);
         for (int b = 0; b < batchSize; b++) {
             List<Value> inputs = new ArrayList<>(length);
@@ -85,12 +84,11 @@ public class TrainingGrounds {
         return batch;
     }
 
-    public static Value fun(List<Value> inputs) {
+    private static Value fun(List<Value> inputs) {
         double sum = 0;
         for (Value input : inputs) {
             sum += input.data;
         }
-        Value out = new Value(sum);
-        return out;
+        return new Value(sum);
     }
 }
