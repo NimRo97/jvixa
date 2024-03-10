@@ -5,29 +5,24 @@ import java.util.List;
 
 public class Layer {
 
-    List<Neuron> neurons = new ArrayList<>();
-    int nNeurons;
+    private final List<Neuron> neurons;
 
-    public Layer(int nNeurons, int nInputs, boolean useBias, Activation activation) {
-        for (int i = 0; i < nNeurons; i++) {
-            neurons.add(new Neuron(nInputs, useBias, activation));
+    public Layer(int neurons, int inputs, boolean useBias, Activation activation) {
+        this.neurons = new ArrayList<>(neurons);
+        for (int i = 0; i < neurons; i++) {
+            this.neurons.add(new Neuron(inputs, useBias, activation));
         }
-        this.nNeurons = nNeurons;
     }
 
     public List<Value> call(List<Value> inputs) {
-        List<Value> output = new ArrayList<>(nNeurons);
-        for (int i = 0; i < nNeurons; i++) {
-            output.add(neurons.get(i).call(inputs));
-        }
-        return output;
+        return neurons.stream().map(neuron -> neuron.call(inputs)).toList();
     }
 
     public List<Value> parameters() {
-        List<Value> parameters = new ArrayList<>();
+        List<Value> list = new ArrayList<>();
         for (Neuron neuron : neurons) {
-            parameters.addAll(neuron.parameters());
+            list.addAll(neuron.parameters());
         }
-        return parameters;
+        return list;
     }
 }

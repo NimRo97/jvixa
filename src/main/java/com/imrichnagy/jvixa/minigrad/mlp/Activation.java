@@ -5,5 +5,4 @@ public enum Activation {
     RELU,
     SIGMOID,
     TANH,
-    ;
 }

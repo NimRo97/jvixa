@@ -14,13 +14,16 @@ public class Neuron {
 
 
     public Neuron(int inputs, boolean useBias, Activation activation) {
+
         weights = new ArrayList<>(inputs);
         for (int i = 0; i < inputs; i++) {
             weights.add(new Value(random.nextDouble(-1, 1), "w" + i));
         }
+
         if (useBias) {
             bias = new Value(0, "b");
         }
+
         this.activation = activation == null ? Activation.LINEAR : activation;
     }
 
@@ -45,10 +48,13 @@ public class Neuron {
     }
 
     public List<Value> parameters() {
+
         List<Value> parameters = new ArrayList<>(weights);
+
         if (bias != null) {
             parameters.add(bias);
         }
+
         return parameters;
     }
 }
