@@ -1,4 +1,4 @@
-package com.imrichnagy.jvixa;
+package com.imrichnagy.jvixa.minigrad.mlp;
 
 import java.util.ArrayList;
 import java.util.HashSet;

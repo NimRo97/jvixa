@@ -1,9 +1,12 @@
-package com.imrichnagy.jvixa;
+package com.imrichnagy.jvixa.minigrad;
+
+import com.imrichnagy.jvixa.minigrad.mlp.Network;
+import com.imrichnagy.jvixa.minigrad.mlp.Value;
 
 import java.util.HashSet;
 import java.util.Random;
 
-public class Main {
+public class TrainingGrounds {
     public static void main(String[] args) {
         int trainingCycles = 5000;
         int[] hiddenLayers = {10, 10, 1};
