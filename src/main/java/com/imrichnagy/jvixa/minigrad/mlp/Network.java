@@ -4,19 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Network {
-    private final List<Layer> layers = new ArrayList<>();
+    private final List<Layer> layers;
 
-    public Network(int nInputs, int[] nLayers, boolean useBias, Activation activation) {
-        for (int i = 0; i < nLayers.length; i++) {
+    public Network(int inputs, boolean useBias, Activation activation, int... layers) {
 
-            int inputs;
-            if (i == 0) {
-                inputs = nInputs;
-            } else {
-                inputs = nLayers[i-1];
-            }
+        this.layers = new ArrayList<>(layers.length);
+        this.layers.add(new Layer(layers[0], inputs, useBias, activation));
 
-            layers.add(new Layer(nLayers[i], inputs, useBias, activation));
+        for (int i = 1; i < layers.length; i++) {
+            this.layers.add(new Layer(layers[i], layers[i-1], useBias, activation));
         }
     }
 
@@ -28,23 +24,22 @@ public class Network {
     }
 
     public List<Value> parameters() {
-        List<Value> params = new ArrayList<>();
+        List<Value> parameters = new ArrayList<>();
         for (Layer layer : layers) {
-            params.addAll(layer.parameters());
+            parameters.addAll(layer.parameters());
         }
-        return params;
+        return parameters;
     }
 
     public void resetGradients() {
-        for (Value p : parameters()) {
-            p.gradient = 0;
+        for (Value parameter : parameters()) {
+            parameter.gradient = 0.0;
         }
     }
 
     public void update(double descent) {
-        List<Value> parameters = this.parameters();
-        for (Value param: parameters) {
-            param.data += -descent * param.gradient;
+        for (Value parameter: parameters()) {
+            parameter.data += -descent * parameter.gradient;
         }
     }
 }

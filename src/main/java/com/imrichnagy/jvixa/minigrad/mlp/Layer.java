@@ -19,10 +19,10 @@ public class Layer {
     }
 
     public List<Value> parameters() {
-        List<Value> list = new ArrayList<>();
+        List<Value> parameters = new ArrayList<>();
         for (Neuron neuron : neurons) {
-            list.addAll(neuron.parameters());
+            parameters.addAll(neuron.parameters());
         }
-        return list;
+        return parameters;
     }
 }

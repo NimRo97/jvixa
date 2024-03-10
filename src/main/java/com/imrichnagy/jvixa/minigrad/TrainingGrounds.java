@@ -2,11 +2,9 @@ package com.imrichnagy.jvixa.minigrad;
 
 import com.imrichnagy.jvixa.minigrad.mlp.Activation;
 import com.imrichnagy.jvixa.minigrad.mlp.Network;
-import com.imrichnagy.jvixa.minigrad.mlp.Operator;
 import com.imrichnagy.jvixa.minigrad.mlp.Value;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -17,13 +15,13 @@ public class TrainingGrounds {
         int batchSize = 100;
         int terms = 10;
         int range = 100;
-        double descend = 1.7e-6; // 1.7e-6 + no bias for LINEAR
+        double descend = 1.8e-6; // 1.7e-6 + no bias for LINEAR
         Random random = new Random();
 
 
         //training data
         List<List<Value>> in = makeData(terms, batchSize, range, random);
-        Network network = new Network(terms, hiddenLayers, false, Activation.LINEAR);
+        Network network = new Network(terms, false, Activation.LINEAR, hiddenLayers);
         Value count = new Value(batchSize);
 
         for (int i = 0; i < trainingCycles; i++) {

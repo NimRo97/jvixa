@@ -6,9 +6,9 @@ import java.util.Random;
 
 public class Neuron {
 
-    List<Value> weights;
-    Value bias = null;
-    Activation activation;
+    private final List<Value> weights;
+    private final Value bias;
+    private final Activation activation;
 
     private static final Random random = new Random();
 
@@ -17,13 +17,10 @@ public class Neuron {
 
         weights = new ArrayList<>(inputs);
         for (int i = 0; i < inputs; i++) {
-            weights.add(new Value(random.nextDouble(-1, 1), "w" + i));
+            weights.add(new Value(random.nextDouble(-1.0, 1.0), "w" + i));
         }
 
-        if (useBias) {
-            bias = new Value(0, "b");
-        }
-
+        bias = useBias ? new Value(0.0, "b") : null;
         this.activation = activation == null ? Activation.LINEAR : activation;
     }
 
