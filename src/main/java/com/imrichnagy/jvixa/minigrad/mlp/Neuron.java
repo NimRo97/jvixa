@@ -15,10 +15,10 @@ public class Neuron {
     public Neuron(int nInputs, boolean useBias, String activation) {
         Random r = new Random();
         for (int i = 0; i < nInputs; i++) {
-            weights.add(new Value(r.nextDouble(), new HashSet<>(), Operator.CONSTANT, "w"+i));
+            weights.add(new Value(r.nextDouble(), "w"+i));
         }
         if (useBias) {
-            bias = new Value(0, new HashSet<>(), Operator.CONSTANT, "b");
+            bias = new Value(0, "b");
         }
         this.useBias = useBias;
     }

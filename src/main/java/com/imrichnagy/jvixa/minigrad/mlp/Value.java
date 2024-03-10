@@ -3,6 +3,7 @@ package com.imrichnagy.jvixa.minigrad.mlp;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 public class Value {
@@ -15,30 +16,28 @@ public class Value {
     private final Set<Value> children;
     private final String label;
 
-    public Value(double data, Set<Value> children, Operator operator, String label) {
+    public Value(double data, String label, Operator operator, Value... children) {
         this.data = data;
         this.gradient = 0;
-        this.children = new HashSet<>(children);
+        this.children = Set.of(children);
         this.operator = operator;
         this.gradientFunction = () -> {};
         this.label = label;
     }
 
-    public Value(double data) {
-        this(data, new HashSet<>(), Operator.CONSTANT, "C" + data);
+    public Value(double data, String label) {
+        this(data, label, Operator.CONSTANT);
     }
 
-    public Value(double data, String label) {
-        this(data, new HashSet<>(), Operator.CONSTANT, label);
+    public Value(double data) {
+        this(data, "C" + data, Operator.CONSTANT);
     }
 
     public Value add(Value other) {
 
         Value out = new Value(
                 this.data + other.data,
-                Set.of(this, other),
-                Operator.ADD,
-                "(" + this.label + "+" + other.label + ")"
+                "(" + this.label + "+" + other.label + ")", Operator.ADD, this, other
         );
 
         out.gradientFunction = () -> {
@@ -53,9 +52,7 @@ public class Value {
 
         Value out = new Value(
                 this.data * other.data,
-                Set.of(this, other),
-                Operator.MULTIPLY,
-                "(" + this.label + "*" + other.label + ")"
+                "(" + this.label + "*" + other.label + ")", Operator.MULTIPLY, this, other
         );
 
         out.gradientFunction = () -> {
@@ -70,9 +67,7 @@ public class Value {
 
         Value out = new Value(
                 this.data - other.data,
-                Set.of(this, other),
-                Operator.SUBTRACT,
-                "(" + this.label + "-" + other.label + ")"
+                "(" + this.label + "-" + other.label + ")", Operator.SUBTRACT, this, other
         );
 
         out.gradientFunction = () -> {
@@ -87,9 +82,7 @@ public class Value {
 
         Value out = new Value(
                 this.data / other.data,
-                Set.of(this, other),
-                Operator.DIVIDE,
-                "(" + this.label + "/" + other.label + ")"
+                "(" + this.label + "/" + other.label + ")", Operator.DIVIDE, this, other
         );
 
         out.gradientFunction = () -> {
@@ -104,9 +97,7 @@ public class Value {
 
         Value out = new Value(
                 Math.pow(this.data, exp),
-                Set.of(this),
-                Operator.POWER,
-                "(" + this.label + "^" + exp + ")"
+                "(" + this.label + "^" + exp + ")", Operator.POWER, this
         );
 
         out.gradientFunction = () -> this.gradient += exp * Math.pow(this.data, exp - 1) * out.gradient;
@@ -115,27 +106,30 @@ public class Value {
     }
 
     public void backward() {
-        Set<Value> topo = new HashSet<>();
         Set<Value> visited = new HashSet<>();
-        List<Value> topoList = new ArrayList<>(topo);
+        List<Value> topography = new ArrayList<>();
 
-        buildTopo(this, topoList, visited);
+        buildTopography(topography, visited);
         this.gradient = 1;
 
-        for (int i = topoList.size() - 1; i >= 0; i--) {
-            Value v = topoList.get(i);
-            v.gradientFunction.run();
+        // reverse iteration
+        ListIterator<Value> listIterator = topography.listIterator(topography.size());
+        while (listIterator.hasPrevious()) {
+            listIterator.previous().gradientFunction.run();
         }
     }
 
-    private void buildTopo(Value v, List<Value> topoList, Set<Value> visited) {
-        if (!visited.contains(v)) {
-            visited.add(v);
-            for (Value child : v.children) {
-                buildTopo(child, topoList, visited);
-            }
-            topoList.add(v);
+    private void buildTopography(List<Value> topography, Set<Value> visited) {
+
+        if (visited.contains(this)) {
+            return;
         }
+
+        visited.add(this);
+        for (Value child : children) {
+            child.buildTopography(topography, visited);
+        }
+        topography.add(this);
     }
 
     @Override
