@@ -7,6 +7,7 @@ public class Layer {
 
     private final List<Neuron> neurons;
 
+
     public Layer(int neurons, int inputs, boolean useBias, Activation activation) {
         this.neurons = new ArrayList<>(neurons);
         for (int i = 0; i < neurons; i++) {

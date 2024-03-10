@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Network {
+
     private final List<Layer> layers;
+
 
     public Network(int inputs, boolean useBias, Activation activation, int... layers) {
 

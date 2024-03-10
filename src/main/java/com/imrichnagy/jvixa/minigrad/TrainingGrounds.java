@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Random;
 
 public class TrainingGrounds {
+
     public static void main(String[] args) {
+
         int trainingCycles = 5000;
         int[] hiddenLayers = {10, 10, 1};
         int batchSize = 100;

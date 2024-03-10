@@ -11,10 +11,12 @@ public class Value {
     public double data;
     public double gradient;
 
-    private final Operator operator;
     private Runnable gradientFunction;
     private final Set<Value> children;
+
+    private final Operator operator;
     private final String label;
+
 
     public Value(double data, String label, Operator operator, Value... children) {
         this.data = data;
@@ -143,6 +145,7 @@ public class Value {
     }
 
     public void backward() {
+
         Set<Value> visited = new HashSet<>();
         List<Value> topography = new ArrayList<>();
 
