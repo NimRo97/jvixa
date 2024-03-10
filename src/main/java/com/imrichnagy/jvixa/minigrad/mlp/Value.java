@@ -105,6 +105,18 @@ public class Value {
         return out;
     }
 
+    public Value sigmoid() {
+        return this; // TODO
+    }
+
+    public Value tanh() {
+        return this; // TODO
+    }
+
+    public Value relu() {
+        return this; // TODO
+    }
+
     public void backward() {
         Set<Value> visited = new HashSet<>();
         List<Value> topography = new ArrayList<>();
