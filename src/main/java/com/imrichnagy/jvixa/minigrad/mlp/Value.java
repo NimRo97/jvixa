@@ -111,7 +111,7 @@ public class Value {
 
         Value out = new Value(
                 1 / (1 + Math.exp(-this.data)),
-                "tanh(" + this.label + ")", Operator.SIGMOID, this
+                "sigmoid(" + this.label + ")", Operator.SIGMOID, this
         );
 
         out.gradientFunction = () -> this.gradient += out.data * (1 - out.data) * out.gradient;
