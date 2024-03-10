@@ -1,12 +1,10 @@
 package com.imrichnagy.jvixa;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class Network {
-    private List<Layer> layers = new ArrayList<>();
+    private final List<Layer> layers = new ArrayList<>();
 
     public Network(int nInputs, int[] nLayers, boolean useBias, String activation) {
         for (int i = 0; i < nLayers.length; i++) {

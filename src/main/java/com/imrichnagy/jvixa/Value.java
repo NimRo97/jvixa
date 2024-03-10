@@ -9,13 +9,13 @@ public class Value {
 
     public double data;
     public double gradient;
-    private String operator;
+    private final String operator;
 
-    private Set<Value> _prev;
+    private final Set<Value> _prev;
 
     private Runnable localgradients;
 
-    private String label;
+    private final String label;
 
     public Value(double data, Set<Value> _children, String _operator, String label) {
         this.data = data;
@@ -69,9 +69,7 @@ public class Value {
 
     public Value pow(int exp) {
         Value out = new Value(Math.pow(this.data, exp), Set.of(this), "^(" + exp + ")", this.label + "power");
-        out.localgradients = () -> {
-            this.gradient += exp * Math.pow(this.data, exp - 1) * out.gradient;
-        };
+        out.localgradients = () -> this.gradient += exp * Math.pow(this.data, exp - 1) * out.gradient;
 
         return out;
     }
