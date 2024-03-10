@@ -4,7 +4,9 @@ import com.imrichnagy.jvixa.minigrad.mlp.Network;
 import com.imrichnagy.jvixa.minigrad.mlp.Operator;
 import com.imrichnagy.jvixa.minigrad.mlp.Value;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 public class TrainingGrounds {
@@ -19,7 +21,7 @@ public class TrainingGrounds {
 
 
         //training data
-        Value[][] in = makeData(terms, batchSize, range, random);
+        List<List<Value>> in = makeData(terms, batchSize, range, random);
         Network network = new Network(terms, hiddenLayers, false, null);
         Value count = new Value(batchSize);
 
@@ -28,13 +30,13 @@ public class TrainingGrounds {
             //forward pass
 
             for (int b = 0; b < batchSize; b++) {
-                Value[] out = network.call(in[b]);
-                Value pred = fun(in[b]);
+                List<Value> out = network.call(in.get(b));
+                Value pred = fun(in.get(b));
 
                 if (b == 0) {
-                    loss = out[0].sub(pred).pow(2);
+                    loss = out.getFirst().sub(pred).pow(2);
                 } else {
-                    loss = loss.add(out[0].sub(pred).pow(2));
+                    loss = loss.add(out.getFirst().sub(pred).pow(2));
                 }
             }
             loss=loss.div(count);
@@ -56,35 +58,35 @@ public class TrainingGrounds {
         in = makeData(terms, 10, range, random);
 
         for (int b = 0; b < 10; b++) {
-            Value[] out = network.call(in[b]);
+            List<Value> out = network.call(in.get(b));
             String addition = "";
-            for (int i = 0; i < in[b].length; i++) {
-                addition += in[b][i].data;
-                if (i < in[b].length - 1) {
+            for (int i = 0; i < in.get(b).size(); i++) {
+                addition += in.get(b).get(i).data;
+                if (i < in.get(b).size() - 1) {
                     addition += " + ";
                 }
             }
-            System.out.println(addition + " = " + out[0].data);
+            System.out.println(addition + " = " + out.getFirst().data);
         }
     }
 
 
-    public static Value[][] makeData(int length, int range, int batchSize, Random random) {
+    public static List<List<Value>> makeData(int length, int range, int batchSize, Random random) {
 
         double sum = 0;
-        Value[][] batch = new Value[batchSize][length];
+        List<List<Value>> batch = new ArrayList<>(batchSize);
         for (int b = 0; b < batchSize; b++) {
-            Value[] inputs = new Value[length];
+            List<Value> inputs = new ArrayList<>(length);
             for (int i = 0; i < length; i++) {
                 double val = random.nextInt(range);
-                inputs[i] = new Value(val, "x" + i + "(" + val + ")");
+                inputs.add(new Value(val, "x" + i + "(" + val + ")"));
             }
-            batch[b] = inputs;
+            batch.add(inputs);
         }
         return batch;
     }
 
-    public static Value fun(Value[] inputs) {
+    public static Value fun(List<Value> inputs) {
         double sum = 0;
         for (Value input : inputs) {
             sum += input.data;

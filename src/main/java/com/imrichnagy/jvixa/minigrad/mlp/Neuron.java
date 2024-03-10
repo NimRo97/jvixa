@@ -1,35 +1,37 @@
 package com.imrichnagy.jvixa.minigrad.mlp;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 public class Neuron {
 
-    List<Value> weights = new ArrayList<>();
-    Value bias;
-    boolean useBias;
+    List<Value> weights;
+    Value bias = null;
+    Activation activation;
+
+    private static final Random random = new Random();
 
 
-    public Neuron(int nInputs, boolean useBias, String activation) {
-        Random r = new Random();
-        for (int i = 0; i < nInputs; i++) {
-            weights.add(new Value(r.nextDouble(), "w"+i));
+    public Neuron(int inputs, boolean useBias, Activation activation) {
+        weights = new ArrayList<>(inputs);
+        for (int i = 0; i < inputs; i++) {
+            weights.add(new Value(random.nextDouble(-1, 1), "w" + i));
         }
         if (useBias) {
             bias = new Value(0, "b");
         }
-        this.useBias = useBias;
+        this.activation = activation;
     }
 
-    public Value call(Value[] inputs) {
+    public Value call(List<Value> inputs) {
         Value out = null;
-        for (int i = 0; i < inputs.length; i++) {
+        for (int i = 0; i < inputs.size(); i++) {
             if (i == 0) {
-                out = inputs[i].mul(weights.get(i));
+                out = inputs.get(i).mul(weights.get(i));
             } else {
-                out = out.add(inputs[i].mul(weights.get(i)));
+                out = out.add(inputs.get(i).mul(weights.get(i)));
             }
         }
         return out;
@@ -37,7 +39,7 @@ public class Neuron {
 
     public List<Value> parameters() {
         List<Value> parameters = new ArrayList<>(weights);
-        if (useBias) {
+        if (bias != null) {
             parameters.add(bias);
         }
         return parameters;

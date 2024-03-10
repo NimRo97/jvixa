@@ -7,7 +7,9 @@ public enum Operator {
     SUBTRACT("-"),
     DIVIDE("/"),
     POWER("2"),
-    SQUARE("^2"),
+    RELU("RELU"),
+    SIGMOID("SIGMOID"),
+    TANH("TANH"),
     ;
 
     private final String label;

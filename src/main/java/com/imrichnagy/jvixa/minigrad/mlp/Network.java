@@ -6,7 +6,7 @@ import java.util.List;
 public class Network {
     private final List<Layer> layers = new ArrayList<>();
 
-    public Network(int nInputs, int[] nLayers, boolean useBias, String activation) {
+    public Network(int nInputs, int[] nLayers, boolean useBias, Activation activation) {
         for (int i = 0; i < nLayers.length; i++) {
 
             int inputs;
@@ -20,7 +20,7 @@ public class Network {
         }
     }
 
-    public Value[] call(Value[] inputs) {
+    public List<Value> call(List<Value> inputs) {
         for (Layer layer : layers) {
             inputs = layer.call(inputs);
         }
