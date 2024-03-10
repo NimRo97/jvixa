@@ -30,7 +30,7 @@ public class Value {
     }
 
     public Value(double data) {
-        this(data, "C" + data, Operator.CONSTANT);
+        this(data, "C" + data);
     }
 
     public Value add(Value other) {
