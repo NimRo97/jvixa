@@ -1,12 +1,13 @@
 package com.imrichnagy.jvixa.minigrad.mlp;
 
 public enum Operator {
+
     CONSTANT("C"),
     ADD("+"),
     MULTIPLY("*"),
     SUBTRACT("-"),
     DIVIDE("/"),
-    POWER("2"),
+    POWER("^"),
     RELU("RELU"),
     SIGMOID("SIGMOID"),
     TANH("TANH"),

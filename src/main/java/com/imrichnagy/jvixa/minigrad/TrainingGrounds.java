@@ -9,36 +9,34 @@ import java.util.List;
 import java.util.Random;
 
 public class TrainingGrounds {
-    public static void main(String[] args) {
-        int trainingCycles = 5000;
-        int[] hiddenLayers = {10, 10, 1};
-        int batchSize = 100;
-        int terms = 10;
-        int range = 100;
-        double descend = 1.8e-6; // 1.7e-6 + no bias for LINEAR
-        Random random = new Random();
 
+    private static final Random random = new Random();
+
+    public static void main(String[] args) {
+
+        int trainingCycles = 2500;
+        int updateFrequency = 50;
+        int[] hiddenLayers = {10, 10, 1};
+        int batches = 100;
+        int terms = 10;
+        int range = 10;
+        double descend = 1.6e-4;
 
         //training data
-        List<List<Value>> in = makeTestData(terms, batchSize, range, random);
+        List<List<Value>> trainingData = makeTestData(terms, range, batches);
         Network network = new Network(terms, false, Activation.LINEAR, hiddenLayers);
-        Value count = new Value(batchSize);
 
         for (int i = 0; i < trainingCycles; i++) {
-            Value loss = null;
+
             //forward pass
+            Value loss = new Value(0);
+            for (List<Value> batch : trainingData) {
+                Value out = network.call(batch).getFirst();
+                Value expected = fun(batch);
 
-            for (int b = 0; b < batchSize; b++) {
-                List<Value> out = network.call(in.get(b));
-                Value expected = fun(in.get(b));
-
-                if (b == 0) {
-                    loss = out.getFirst().sub(expected).pow(2);
-                } else {
-                    loss = loss.add(out.getFirst().sub(expected).pow(2));
-                }
+                loss = loss.add(out.sub(expected).pow(2));
             }
-            loss=loss.div(count);
+            loss=loss.div(new Value(batches));
 
             //reset gradients
             network.resetGradients();
@@ -49,38 +47,32 @@ public class TrainingGrounds {
             //update parameters
             network.update(descend);
 
-            if (i % 50 == 0) {
+            if (i % updateFrequency == 0) {
                 System.out.println("Iteration " + i + " | mse: " + loss.data);
             }
         }
 
-        in = makeTestData(terms, 10, range, random);
-
-        for (int b = 0; b < 10; b++) {
-            List<Value> out = network.call(in.get(b));
-            String addition = "";
-            for (int i = 0; i < in.get(b).size(); i++) {
-                addition += in.get(b).get(i).data;
-                if (i < in.get(b).size() - 1) {
-                    addition += " + ";
-                }
-            }
-            System.out.println(addition + " = " + out.getFirst().data);
+        List<List<Value>> testData = makeTestData(terms, range, 10);
+        for (List<Value> batch : testData) {
+            Value out = network.call(batch).getFirst();
+            String addition = String.join(" + ", batch.stream().map(v -> "" + v.data).toList());
+            System.out.println(addition + " = " + out.data);
         }
     }
 
-
-    private static List<List<Value>> makeTestData(int length, int range, int batchSize, Random random) {
+    private static List<List<Value>> makeTestData(int length, int range, int batchSize) {
 
         List<List<Value>> batch = new ArrayList<>(batchSize);
+
         for (int b = 0; b < batchSize; b++) {
             List<Value> inputs = new ArrayList<>(length);
             for (int i = 0; i < length; i++) {
                 double val = random.nextInt(range);
-                inputs.add(new Value(val, "x" + i + "(" + val + ")"));
+                inputs.add(new Value(val, "x" + i));
             }
             batch.add(inputs);
         }
+
         return batch;
     }
 

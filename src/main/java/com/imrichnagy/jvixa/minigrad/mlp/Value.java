@@ -11,10 +11,12 @@ public class Value {
     public double data;
     public double gradient;
 
-    private final Operator operator;
     private Runnable gradientFunction;
     private final Set<Value> children;
+
+    private final Operator operator;
     private final String label;
+
 
     public Value(double data, String label, Operator operator, Value... children) {
         this.data = data;
@@ -109,7 +111,7 @@ public class Value {
 
         Value out = new Value(
                 1 / (1 + Math.exp(-this.data)),
-                "tanh(" + this.label + ")", Operator.SIGMOID, this
+                "sigmoid(" + this.label + ")", Operator.SIGMOID, this
         );
 
         out.gradientFunction = () -> this.gradient += out.data * (1 - out.data) * out.gradient;
@@ -143,6 +145,7 @@ public class Value {
     }
 
     public void backward() {
+
         Set<Value> visited = new HashSet<>();
         List<Value> topography = new ArrayList<>();
 
