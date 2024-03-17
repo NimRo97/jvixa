@@ -23,14 +23,25 @@ import static guru.nidi.graphviz.model.Factory.*;
 public class GraphVisualizer {
 
     public static void visualize(Value root, String filename) throws IOException {
-        visualize(root, filename, null, null);
+        visualize(root, filename, true, null, null);
     }
 
-    public static void visualize(Value root, String filename, Network network, List<Value> inputs) throws IOException {
+    public static void visualize(Value root, String filename, boolean detached, Network network, List<Value> inputs) throws IOException {
         MutableGraph g = mutGraph("tree").setDirected(true);
         g.graphAttrs().add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
 
         ValueGraph vg = buildGraph(root);
+
+        if (detached) {
+            drawDetached(vg, g, network, inputs);
+        } else {
+            draw(vg, g);
+        }
+
+        Graphviz.fromGraph(g).render(Format.SVG).toFile(new File(System.getProperty("user.home") + "/" + filename + ".svg"));
+    }
+
+    private static void drawDetached(ValueGraph vg, MutableGraph g, Network network, List<Value> inputs) {
 
         Sequence seq = new Sequence();
 
@@ -57,17 +68,38 @@ public class GraphVisualizer {
         if (network != null) {
             rankGraph(g, nodes, network, inputs);
         }
+    }
 
-        Graphviz.fromGraph(g).render(Format.SVG).toFile(new File(System.getProperty("user.home") + "/" + filename + ".svg"));
+    private static void draw(ValueGraph vg, MutableGraph g) {
+
+        Sequence seq = new Sequence();
+
+        Map<Value, MutableNode> nodes = new HashMap<>();
+        for (Value node : vg.nodes) {
+            MutableNode n = mutNode("node" + seq.next())
+                    .add(Shape.BOX)
+                    .add("label", node.representation + String.format(" | data: %.4f\n grad: %.4f", node.data, node.gradient));
+            if (node.operator == Operator.CONSTANT) {
+                n.add(Color.RED);
+            }
+            nodes.put(node, n);
+        }
+
+        for (Pair<Value, Value> edge : vg.edges) {
+            nodes.get(edge.getLeft()).addLink(nodes.get(edge.getRight()));
+        }
+        nodes.values().forEach(g::add);
     }
 
     // Works bad for larger networks
     private static void rankGraph(MutableGraph g, Map<Value, Pair<MutableNode, MutableNode>> nodes, Network network, List<Value> inputs) {
+
         List<MutableNode> inputNodes = new ArrayList<>();
         for (Value value : inputs) {
             inputNodes.add(nodes.get(value).getLeft());
         }
         g.add(graph().graphAttr().with(Rank.inSubgraph(SAME)).with(inputNodes));
+
         for (Layer layer : network.layers) {
             List<MutableNode> layerNodes = new ArrayList<>();
             for (Value value : layer.parameters()) {
