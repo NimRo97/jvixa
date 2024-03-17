@@ -12,10 +12,11 @@ public class Value {
     public double gradient;
 
     private Runnable gradientFunction;
-    private final Set<Value> children;
+    public final Set<Value> children;
 
-    private final Operator operator;
+    public final Operator operator;
     private final String label;
+    public String representation;
 
 
     public Value(double data, String label, Operator operator, Value... children) {
@@ -25,14 +26,17 @@ public class Value {
         this.operator = operator;
         this.gradientFunction = () -> {};
         this.label = label;
+        this.representation = operator.toString();
     }
 
     public Value(double data, String label) {
         this(data, label, Operator.CONSTANT);
+        this.representation = label;
     }
 
     public Value(double data) {
         this(data, "C" + data);
+        this.representation = operator.toString();
     }
 
     public Value add(Value other) {

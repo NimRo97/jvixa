@@ -5,16 +5,16 @@ import java.util.List;
 
 public class Network {
 
-    private final List<Layer> layers;
+    public final List<Layer> layers;
 
 
     public Network(int inputs, boolean useBias, Activation activation, int... layers) {
 
         this.layers = new ArrayList<>(layers.length);
-        this.layers.add(new Layer(layers[0], inputs, useBias, activation));
+        this.layers.add(new Layer(layers[0], inputs, useBias, activation, "L0"));
 
         for (int i = 1; i < layers.length; i++) {
-            this.layers.add(new Layer(layers[i], layers[i-1], useBias, activation));
+            this.layers.add(new Layer(layers[i], layers[i-1], useBias, activation, "L" + i));
         }
     }
 

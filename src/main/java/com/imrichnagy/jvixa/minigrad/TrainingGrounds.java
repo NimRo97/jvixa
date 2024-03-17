@@ -4,6 +4,7 @@ import com.imrichnagy.jvixa.minigrad.mlp.Activation;
 import com.imrichnagy.jvixa.minigrad.mlp.Network;
 import com.imrichnagy.jvixa.minigrad.mlp.Value;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +13,7 @@ public class TrainingGrounds {
 
     private static final Random random = new Random();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         int trainingCycles = 2500;
         int updateFrequency = 50;
@@ -55,6 +56,7 @@ public class TrainingGrounds {
         List<List<Value>> testData = makeTestData(terms, range, 10);
         for (List<Value> batch : testData) {
             Value out = network.call(batch).getFirst();
+            GraphVisualizer.visualize(out, "batch_" + testData.indexOf(batch));
             String addition = String.join(" + ", batch.stream().map(v -> "" + v.data).toList());
             System.out.println(addition + " = " + out.data);
         }

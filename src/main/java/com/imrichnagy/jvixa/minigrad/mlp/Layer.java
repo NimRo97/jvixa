@@ -8,11 +8,15 @@ public class Layer {
     private final List<Neuron> neurons;
 
 
-    public Layer(int neurons, int inputs, boolean useBias, Activation activation) {
+    public Layer(int neurons, int inputs, boolean useBias, Activation activation, String layerSuffix) {
         this.neurons = new ArrayList<>(neurons);
         for (int i = 0; i < neurons; i++) {
-            this.neurons.add(new Neuron(inputs, useBias, activation));
+            this.neurons.add(new Neuron(inputs, useBias, activation, "N" + i, layerSuffix));
         }
+    }
+
+    public Layer(int neurons, int inputs, boolean useBias, Activation activation) {
+        this(neurons, inputs, useBias, activation, null);
     }
 
     public List<Value> call(List<Value> inputs) {
