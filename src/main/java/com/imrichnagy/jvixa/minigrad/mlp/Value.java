@@ -1,6 +1,7 @@
 package com.imrichnagy.jvixa.minigrad.mlp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -12,10 +13,11 @@ public class Value {
     public double gradient;
 
     private Runnable gradientFunction;
-    private final Set<Value> children;
+    public final Set<Value> children;
 
-    private final Operator operator;
+    public final Operator operator;
     private final String label;
+    public String representation;
 
 
     public Value(double data, String label, Operator operator, Value... children) {
@@ -25,14 +27,17 @@ public class Value {
         this.operator = operator;
         this.gradientFunction = () -> {};
         this.label = label;
+        this.representation = operator.toString();
     }
 
     public Value(double data, String label) {
         this(data, label, Operator.CONSTANT);
+        this.representation = label;
     }
 
     public Value(double data) {
         this(data, "C" + data);
+        this.representation = operator.toString();
     }
 
     public Value add(Value other) {
@@ -46,6 +51,17 @@ public class Value {
             this.gradient += 1 * out.gradient;
             other.gradient += 1 * out.gradient;
         };
+
+        return out;
+    }
+
+    public static Value sum(Value... values) {
+        Value out = new Value(
+                Arrays.stream(values).reduce(0.0, (acc, value) -> acc + value.data, Double::sum),
+                "(" + String.join("+", Arrays.stream(values).map(v -> "" + v.data).toList()) + ")", Operator.ADD, values
+        );
+
+        out.gradientFunction = () -> out.children.forEach(child -> child.gradient += 1 * out.gradient);
 
         return out;
     }

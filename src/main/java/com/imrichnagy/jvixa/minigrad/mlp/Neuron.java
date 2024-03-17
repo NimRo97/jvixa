@@ -13,15 +13,22 @@ public class Neuron {
     private static final Random random = new Random();
 
 
-    public Neuron(int inputs, boolean useBias, Activation activation) {
+    public Neuron(int inputs, boolean useBias, Activation activation, String neuronSuffix, String layerSuffix) {
 
         weights = new ArrayList<>(inputs);
         for (int i = 0; i < inputs; i++) {
-            weights.add(new Value(random.nextDouble(-1.0, 1.0), "w" + i));
+            weights.add(new Value(
+                    random.nextDouble(-1.0, 1.0),
+                    "w" + i + (neuronSuffix == null ? "" : neuronSuffix) + (layerSuffix == null ? "" : layerSuffix)
+            ));
         }
 
         bias = useBias ? new Value(0.0, "b") : null;
         this.activation = activation == null ? Activation.LINEAR : activation;
+    }
+
+    public Neuron(int inputs, boolean useBias, Activation activation) {
+        this(inputs, useBias, activation, null, null);
     }
 
     public Value call(List<Value> inputs) {
@@ -35,6 +42,28 @@ public class Neuron {
         if (bias != null) {
             out = out.add(bias);
         }
+
+        return switch (activation) {
+            case LINEAR -> out;
+            case SIGMOID -> out.sigmoid();
+            case TANH -> out.tanh();
+            case RELU -> out.relu();
+        };
+    }
+
+    public Value callFast(List<Value> inputs) {
+
+        List<Value> outs = new ArrayList<>(inputs.size() + (bias == null ? 0 : 1));
+
+        for (int i = 0; i < inputs.size(); i++) {
+            outs.add(inputs.get(i).mul(weights.get(i)));
+        }
+
+        if (bias != null) {
+            outs.add(bias);
+        }
+
+        Value out = Value.sum(outs.toArray(new Value[0]));
 
         return switch (activation) {
             case LINEAR -> out;

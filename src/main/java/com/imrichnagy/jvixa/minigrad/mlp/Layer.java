@@ -8,15 +8,19 @@ public class Layer {
     private final List<Neuron> neurons;
 
 
-    public Layer(int neurons, int inputs, boolean useBias, Activation activation) {
+    public Layer(int neurons, int inputs, boolean useBias, Activation activation, String layerSuffix) {
         this.neurons = new ArrayList<>(neurons);
         for (int i = 0; i < neurons; i++) {
-            this.neurons.add(new Neuron(inputs, useBias, activation));
+            this.neurons.add(new Neuron(inputs, useBias, activation, "N" + i, layerSuffix));
         }
     }
 
     public List<Value> call(List<Value> inputs) {
         return neurons.stream().map(neuron -> neuron.call(inputs)).toList();
+    }
+
+    public List<Value> callFast(List<Value> inputs) {
+        return neurons.stream().map(neuron -> neuron.callFast(inputs)).toList();
     }
 
     public List<Value> parameters() {
