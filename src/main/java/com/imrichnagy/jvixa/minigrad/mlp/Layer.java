@@ -15,12 +15,12 @@ public class Layer {
         }
     }
 
-    public Layer(int neurons, int inputs, boolean useBias, Activation activation) {
-        this(neurons, inputs, useBias, activation, null);
-    }
-
     public List<Value> call(List<Value> inputs) {
         return neurons.stream().map(neuron -> neuron.call(inputs)).toList();
+    }
+
+    public List<Value> callFast(List<Value> inputs) {
+        return neurons.stream().map(neuron -> neuron.callFast(inputs)).toList();
     }
 
     public List<Value> parameters() {

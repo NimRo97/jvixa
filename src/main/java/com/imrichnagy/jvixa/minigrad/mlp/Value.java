@@ -1,6 +1,7 @@
 package com.imrichnagy.jvixa.minigrad.mlp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -50,6 +51,17 @@ public class Value {
             this.gradient += 1 * out.gradient;
             other.gradient += 1 * out.gradient;
         };
+
+        return out;
+    }
+
+    public static Value sum(Value... values) {
+        Value out = new Value(
+                Arrays.stream(values).reduce(0.0, (acc, value) -> acc + value.data, Double::sum),
+                "(" + String.join("+", Arrays.stream(values).map(v -> "" + v.data).toList()) + ")", Operator.ADD, values
+        );
+
+        out.gradientFunction = () -> out.children.forEach(child -> child.gradient += 1 * out.gradient);
 
         return out;
     }

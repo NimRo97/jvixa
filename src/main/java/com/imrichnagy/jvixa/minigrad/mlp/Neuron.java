@@ -51,6 +51,28 @@ public class Neuron {
         };
     }
 
+    public Value callFast(List<Value> inputs) {
+
+        List<Value> outs = new ArrayList<>(inputs.size() + (bias == null ? 0 : 1));
+
+        for (int i = 0; i < inputs.size(); i++) {
+            outs.add(inputs.get(i).mul(weights.get(i)));
+        }
+
+        if (bias != null) {
+            outs.add(bias);
+        }
+
+        Value out = Value.sum(outs.toArray(new Value[0]));
+
+        return switch (activation) {
+            case LINEAR -> out;
+            case SIGMOID -> out.sigmoid();
+            case TANH -> out.tanh();
+            case RELU -> out.relu();
+        };
+    }
+
     public List<Value> parameters() {
 
         List<Value> parameters = new ArrayList<>(weights);

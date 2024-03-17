@@ -25,6 +25,13 @@ public class Network {
         return inputs;
     }
 
+    public List<Value> callFast(List<Value> inputs) {
+        for (Layer layer : layers) {
+            inputs = layer.callFast(inputs);
+        }
+        return inputs;
+    }
+
     public List<Value> parameters() {
         List<Value> parameters = new ArrayList<>();
         for (Layer layer : layers) {
