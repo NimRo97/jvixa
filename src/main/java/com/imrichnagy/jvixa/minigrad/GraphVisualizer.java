@@ -15,7 +15,10 @@ import org.graalvm.collections.Pair;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static guru.nidi.graphviz.attribute.Rank.RankType.SAME;
 import static guru.nidi.graphviz.model.Factory.*;
@@ -30,23 +33,23 @@ public class GraphVisualizer {
         MutableGraph g = mutGraph("tree").setDirected(true);
         g.graphAttrs().add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
 
-        ValueGraph vg = buildGraph(root);
+        List<Value> allValues = buildGraph(root);
 
         if (detached) {
-            drawDetached(vg, g, network, inputs);
+            drawDetached(allValues, g, network, inputs);
         } else {
-            draw(vg, g);
+            draw(allValues, g);
         }
 
         Graphviz.fromGraph(g).render(Format.SVG).toFile(new File(System.getProperty("user.home") + "/" + filename + ".svg"));
     }
 
-    private static void drawDetached(ValueGraph vg, MutableGraph g, Network network, List<Value> inputs) {
+    private static void drawDetached(List<Value> values, MutableGraph g, Network network, List<Value> inputs) {
 
         Sequence seq = new Sequence();
 
         Map<Value, Pair<MutableNode, MutableNode>> nodes = new HashMap<>();
-        for (Value node : vg.nodes) {
+        for (Value node : values) {
             MutableNode n1 = mutNode("node" + seq.next())
                     .add(Shape.ELLIPSE)
                     .add("label", node.representation);
@@ -60,9 +63,12 @@ public class GraphVisualizer {
             nodes.put(node, Pair.create(n1, n2));
         }
 
-        for (Pair<Value, Value> edge : vg.edges) {
-            nodes.get(edge.getLeft()).getRight().addLink(nodes.get(edge.getRight()).getLeft());
+        for (Value node : values) {
+            for (Value child : node.children) {
+                nodes.get(child).getRight().addLink(nodes.get(node).getLeft());
+            }
         }
+
         nodes.values().forEach(v -> g.add(v.getLeft(), v.getRight()));
 
         if (network != null) {
@@ -70,12 +76,12 @@ public class GraphVisualizer {
         }
     }
 
-    private static void draw(ValueGraph vg, MutableGraph g) {
+    private static void draw(List<Value> vg, MutableGraph g) {
 
         Sequence seq = new Sequence();
 
         Map<Value, MutableNode> nodes = new HashMap<>();
-        for (Value node : vg.nodes) {
+        for (Value node : vg) {
             MutableNode n = mutNode("node" + seq.next())
                     .add(Shape.BOX)
                     .add("label", node.representation + String.format(" | data: %.4f\n grad: %.4f", node.data, node.gradient));
@@ -85,9 +91,12 @@ public class GraphVisualizer {
             nodes.put(node, n);
         }
 
-        for (Pair<Value, Value> edge : vg.edges) {
-            nodes.get(edge.getLeft()).addLink(nodes.get(edge.getRight()));
+        for (Value node : vg) {
+            for (Value child : node.children) {
+                nodes.get(child).addLink(nodes.get(node));
+            }
         }
+
         nodes.values().forEach(g::add);
     }
 
@@ -109,8 +118,6 @@ public class GraphVisualizer {
         }
     }
 
-    private record ValueGraph(List<Value> nodes, List<Pair<Value, Value>> edges) {}
-
     private static final class Sequence {
         private long value = 0;
 
@@ -119,21 +126,19 @@ public class GraphVisualizer {
         }
     }
 
-    private static ValueGraph buildGraph(Value root) {
+    private static List<Value> buildGraph(Value root) {
         List<Value> nodes = new ArrayList<>();
-        List<Pair<Value, Value>> edges = new ArrayList<>();
-        trace(root, nodes, edges);
-        return new ValueGraph(nodes, edges);
+        trace(root, nodes);
+        return nodes;
     }
 
-    private static void trace(Value node, List<Value> nodes, List<Pair<Value, Value>> edges) {
+    private static void trace(Value node, List<Value> nodes) {
         if (nodes.contains(node)) {
             return;
         }
         nodes.add(node);
         for (Value child : node.children) {
-            edges.add(Pair.create(child, node));
-            trace(child, nodes, edges);
+            trace(child, nodes);
         }
     }
 }
