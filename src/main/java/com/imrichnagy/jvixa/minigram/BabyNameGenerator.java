@@ -1,4 +1,4 @@
-package com.imrichnagy.jvixa.minigram.jngram;
+package com.imrichnagy.jvixa.minigram;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.imrichnagy.jvixa.minigram.jngram.NativeNgram.NAME_ALPHABET;
-import static com.imrichnagy.jvixa.minigram.jngram.NativeNgram.getPosition;
+import static com.imrichnagy.jvixa.minigram.NativeNgram.NAME_ALPHABET;
+import static com.imrichnagy.jvixa.minigram.NativeNgram.getPosition;
 
 public class BabyNameGenerator {
 
