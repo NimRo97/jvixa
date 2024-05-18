@@ -1,4 +1,4 @@
-package com.imrichnagy.jvixa.minigram.jngram;
+package com.imrichnagy.jvixa.minigram;
 
 import java.util.Arrays;
 import java.util.List;
